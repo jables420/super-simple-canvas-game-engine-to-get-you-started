@@ -1,27 +1,53 @@
 //@ts-check
 
 let objects = [];
-//canvas.width = window.innerWidth; //
-//canvas.height = window.innerHeight;
 
-export class GameCanvas {
+class BaseObject {
+  constructor() {
+    this.id = objects.length;
+    objects.push(this);
+  }
+
+  die() {
+    objects.splice(this.id, 1);
+  }
+
+  updateDimensions() {
+    throw new Error("updateDimensions() must be implemented by subclass");
+  }
+
+  draw() {
+    throw new Error("draw() must be implemented by subclass");
+  }
+}
+
+class GameCanvas {
   constructor(canvas) {
-    this.canvas = canvas
+    this.canvas = canvas;
+
+    // Setup DPI scaling:
+    this.dpr = window.devicePixelRatio || 1;
+    this.width = canvas.clientWidth;
+    this.height = canvas.clientHeight;
+
+    canvas.width = this.width * this.dpr;
+    canvas.height = this.height * this.dpr;
+    canvas.style.width = this.width + "px";
+    canvas.style.height = this.height + "px";
+
     this.ctx = canvas.getContext("2d");
-    this.width = canvas.width;
-    this.height = canvas.height;
+    this.ctx.scale(this.dpr, this.dpr);
   }
 
   clear() {
-    //@ts-ignore
-    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    this.ctx.clearRect(0, 0, this.width, this.height);
   }
 
   updateFrame() {
     for (const object of objects) {
-      object.updateDimensions()
-      object.draw()
-    }  
+      if (typeof object.updateDimensions === "function") object.updateDimensions();
+      if (typeof object.draw === "function") object.draw();
+    }
   }
 
   rectCollision(a, b) {
@@ -38,62 +64,53 @@ export class GameCanvas {
   }
 }
 
-export class Line {
-  constructor(canvas, x1 = 0, y1 = 0, x2 = 0, y2 = 0, lineColor = "black", lineWidth = 2) {
-    this.canvas = canvas;
-    this.ctx = canvas.getContext("2d");
+class Line extends BaseObject {
+  // Note: changed param from canvas to ctx!
+  constructor(ctx, x1 = 0, y1 = 0, x2 = 0, y2 = 0, lineColor = "black", lineWidth = 1) {
+    super();
+    this.ctx = ctx;
     this.x1 = x1;
     this.y1 = y1;
     this.x2 = x2;
     this.y2 = y2;
     this.lineColor = lineColor;
     this.lineWidth = lineWidth;
-
-    this.id = objects.length; //since id start from 0
-    objects.push(this);
-  //why is 'objects' needed? well every frame everythis has to be redrawn
-    this.die = function() {
-      objects.splice(this.id,1);
-    } 
   }
 
   draw() {
     this.ctx.strokeStyle = this.lineColor;
     this.ctx.lineWidth = this.lineWidth;
-  
+
     this.ctx.beginPath();
-    this.ctx.moveTo(this.x1, this.y1);
-    this.ctx.lineTo(this.x2, this.y2);
+    // Pixel-align for crisp 1px lines:
+    this.ctx.moveTo(this.x1 + 0.5, this.y1 + 0.5);
+    this.ctx.lineTo(this.x2 + 0.5, this.y2 + 0.5);
     this.ctx.stroke();
     this.ctx.closePath();
   }
 
   updateDimensions() {
-    //pass
+    // pass
   }
 }
-//////////Add Event Listener///////////
 
 const isKeyDown = {};
 
-document.addEventListener("keydown", function(event) {
+document.addEventListener("keydown", function (event) {
   isKeyDown[event.key] = true;
-  console.log('detected key down', event.key);
+  console.log("detected key down", event.key);
 });
 
-document.addEventListener("keyup", function(event) {
+document.addEventListener("keyup", function (event) {
   isKeyDown[event.key] = false;
-  console.log('detected key up', event.key);
+  console.log("detected key up", event.key);
 });
 
-export { isKeyDown };
-
-////////////////game functions//////////////
-
-export class Circle {
-  constructor(canvas, centerX, centerY, radius, color = "red") {
-    this.canvas = canvas;
-    this.ctx = canvas.getContext("2d");
+class Circle extends BaseObject {
+  // changed param canvas -> ctx
+  constructor(ctx, centerX, centerY, radius, color = "red") {
+    super();
+    this.ctx = ctx;
     this.centerX = centerX;
     this.centerY = centerY;
     this.radius = radius;
@@ -104,39 +121,32 @@ export class Circle {
     this.border = false;
     this.borderColor = "black";
 
-    this.id = objects.length; //since id start from 0
-    objects.push(this);
-  //why is 'objects' needed? well every frame everythis has to be redrawn
-    this.die = function() {
-      objects.splice(this.id,1);
-    } 
-
     this.vspeed = 0;
     this.hspeed = 0;
   }
 
   draw() {
-    if (this.border == true) {
+    if (this.border) {
       this.ctx.beginPath();
-      
+
       this.ctx.strokeStyle = this.borderColor;
       this.ctx.lineWidth = this.lineWidth;
-      
+
       this.ctx.arc(this.centerX, this.centerY, this.radius, 0, 2 * Math.PI);
       this.ctx.stroke();
       this.ctx.closePath();
 
-      console.log("Drew")
+      console.log("Drew");
     }
-      
-    if (this.fill == true) {
+
+    if (this.fill) {
       this.ctx.beginPath();
-      
+
       this.ctx.fillStyle = this.color;
       this.ctx.arc(this.centerX, this.centerY, this.radius, 0, 2 * Math.PI);
       this.ctx.fill();
 
-      this.ctx.closePath()
+      this.ctx.closePath();
     }
   }
 
@@ -146,58 +156,52 @@ export class Circle {
   }
 }
 
-export class Rect {
-  constructor(canvas, x, y, width, height, color = "red") {
-    this.canvas = canvas;
-    this.ctx = canvas.getContext("2d");
+class Rect extends BaseObject {
+  // changed param canvas -> ctx
+  constructor(ctx, x, y, width, height, color = "red", lineWidth = 2) {
+    super();
+    this.ctx = ctx;
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
 
-    this.lineWidth = 2;
+    this.lineWidth = lineWidth;
     this.color = color;
     this.borderColor = "black";
     this.fill = true;
     this.border = false;
-    
+
     this.topEdge = y;
     this.bottomEdge = y + height;
     this.leftEdge = x;
     this.rightEdge = x + width;
-
-    this.id = objects.length; //since id start from 0
-    objects.push(this);
-  //why is 'objects' needed? well every frame everythis has to be redrawn
-    this.die = function() {
-      objects.splice(this.id,1);
-      this.ctx.clearRect(this.leftEdge, this.topEdge, this.width, this.height)
-    } 
 
     this.vspeed = 0;
     this.hspeed = 0;
   }
 
   draw() {
-    if (this.border == true) {
+    if (this.border) {
       this.ctx.strokeStyle = this.borderColor;
       this.ctx.lineWidth = this.lineWidth;
-      this.ctx.strokeRect(this.x, this.y, this.width, this.height)
+      this.ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
-    if (this.fill == true) {
+    if (this.fill) {
       this.ctx.fillStyle = this.color;
       this.ctx.fillRect(this.x, this.y, this.width, this.height);
     }
   }
 
-
   updateDimensions() {
     this.x += this.hspeed;
     this.y += this.vspeed;
-    
+
     this.topEdge = this.y;
     this.bottomEdge = this.y + this.height;
     this.leftEdge = this.x;
     this.rightEdge = this.x + this.width;
   }
 }
+
+export { GameCanvas, Line, Circle, Rect, isKeyDown };
