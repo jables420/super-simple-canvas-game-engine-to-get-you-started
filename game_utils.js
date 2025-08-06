@@ -1,7 +1,7 @@
 //@ts-check
 
 import { GameCanvas } from "./game_engine.js";
-import { gameLoop } from "./game_config.js";
+import { gameLoop } from "./game_loop.js";
 
 let fps = 60;
 let now;
@@ -14,7 +14,7 @@ const gameCanvas = new GameCanvas(canvas);
 
 //////////////////game!////////////////////////////////
 
-function startGame() {
+export function startGame() {
   //clear(ctx);
   
   requestAnimationFrame(startGame);
@@ -30,6 +30,3 @@ function startGame() {
     gameLoop();
   }
 }
-
-
-startGame()

@@ -2,6 +2,8 @@
 
 import { GameCanvas, isKeyDown } from "./game_engine.js";
 import { Rect, Circle, Line } from "./game_engine.js";
+import { startGame } from "./game_utils.js";
+
 
 const canvas = document.getElementById("canvas");
 const gameCanvas = new GameCanvas(canvas);
@@ -59,3 +61,5 @@ export function gameLoop() {
 
   console.log(square.leftEdge, square.rightEdge, square.topEdge, square.bottomEdge);
 }
+
+startGame();
