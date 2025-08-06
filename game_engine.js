@@ -121,8 +121,8 @@ class Circle extends BaseObject {
     this.border = false;
     this.borderColor = "black";
 
-    this.vspeed = 0;
-    this.hspeed = 0;
+    this.vy = 0;
+    this.vx = 0;
   }
 
   draw() {
@@ -151,8 +151,8 @@ class Circle extends BaseObject {
   }
 
   updateDimensions() {
-    this.centerX += this.hspeed;
-    this.centerY += this.vspeed;
+    this.centerX += this.vx;
+    this.centerY += this.vy;
   }
 }
 
@@ -177,8 +177,8 @@ class Rect extends BaseObject {
     this.leftEdge = x;
     this.rightEdge = x + width;
 
-    this.vspeed = 0;
-    this.hspeed = 0;
+    this.vy = 0;
+    this.vx = 0;
   }
 
   draw() {
@@ -194,8 +194,8 @@ class Rect extends BaseObject {
   }
 
   updateDimensions() {
-    this.x += this.hspeed;
-    this.y += this.vspeed;
+    this.x += this.vx;
+    this.y += this.vy;
 
     this.topEdge = this.y;
     this.bottomEdge = this.y + this.height;
