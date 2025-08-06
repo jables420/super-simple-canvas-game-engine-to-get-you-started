@@ -1,29 +1,31 @@
-gameRunning = true;
-var fps = 60;
-var now;
-var then = Date.now();
-var interval = 1000/fps;
-var delta;
-var score = 0;
+//@ts-check
+
+import {GameCanvas, isKeyDown} from "./game_engine.js";
+import {Rect, Circle, Line} from "./game_engine.js";
+
+let fps = 60;
+let now;
+let then = Date.now();
+let interval = 1000/fps;
+let delta;
 const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
 
 const gameCanvas = new GameCanvas(canvas)
 ///////////////////define variables/////////////////////
-var square = new Rect(canvas, 10, 10, 50, 50, "purple");
+let square = new Rect(canvas, 10, 10, 50, 50, "purple");
 square.fill = false;
 square.borderColor = "purple";
 square.border = true;
 square.lineWidth = 2; //
 
-var circle = new Circle(canvas, 100, 100, 20, "red")
+let circle = new Circle(canvas, 100, 100, 20, "red")
 circle.fill = true;
 
-var line = new Line(canvas);
+let line = new Line(canvas);
 
 document.onmousemove = updateCoordinates;
-clientX = 0;
-clientY = 0;
+let clientX = 0;
+let clientY = 0;
 
 function updateCoordinates(e) {
   clientX = e.clientX;
@@ -43,26 +45,28 @@ function startGame() {
   if (delta > interval) {
     then = now - (delta % interval);
 
-    gameCanvas.clear(ctx)
-    gameCanvas.updateFrame(ctx)
+    gameCanvas.clear();
+    gameCanvas.updateFrame();
 
     circle.centerX = clientX;
     circle.centerY = clientY;
     
     ///demo movement///
-    if (isKeyDown.ArrowLeft || isKeyDown.a && square.leftEdge > 0) {
+    if (isKeyDown["ArrowLeft"] || isKeyDown["a"] && square.leftEdge > 0) {
       square.x -= 5;
     }
     
-    if (isKeyDown.ArrowRight || isKeyDown.d && square.rightEdge < canvas.width) {
+    //@ts-ignore
+    if (isKeyDown["ArrowRight"] || isKeyDown["d"] && square.rightEdge < canvas.width) {
       square.x += 5;
     }
     
-    if (isKeyDown.ArrowUp || isKeyDown.w && square.topEdge > 0) {
+    if (isKeyDown["ArrowUp"] || isKeyDown["w"] && square.topEdge > 0) {
       square.y -= 5;
     } 
     
-    if (isKeyDown.ArrowDown || isKeyDown.s && square.bottomEdge < canvas.height) {
+    //@ts-ignore canvas DOES exist
+    if (isKeyDown["ArrowDown"] || isKeyDown["s"] && square.bottomEdge < canvas.height) {
       square.y += 5;
     }
 

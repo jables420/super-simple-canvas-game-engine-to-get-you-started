@@ -1,8 +1,10 @@
-var objects = [];
+//@ts-check
+
+let objects = [];
 //canvas.width = window.innerWidth; //
 //canvas.height = window.innerHeight;
 
-class GameCanvas {
+export class GameCanvas {
   constructor(canvas) {
     this.canvas = canvas
     this.ctx = canvas.getContext("2d");
@@ -11,6 +13,7 @@ class GameCanvas {
   }
 
   clear() {
+    //@ts-ignore
     this.ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
@@ -35,7 +38,7 @@ class GameCanvas {
   }
 }
 
-class Line {
+export class Line {
   constructor(canvas, x1 = 0, y1 = 0, x2 = 0, y2 = 0, lineColor = "black", lineWidth = 2) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
@@ -51,7 +54,6 @@ class Line {
   //why is 'objects' needed? well every frame everythis has to be redrawn
     this.die = function() {
       objects.splice(this.id,1);
-      this.ctx.clearRect(this.centerX, this.y, this.width, this.height)
     } 
   }
 
@@ -72,34 +74,29 @@ class Line {
 }
 //////////Add Event Listener///////////
 
+const isKeyDown = {};
+
 document.addEventListener("keydown", function(event) {
   isKeyDown[event.key] = true;
-  console.log('deteced key down', event.key)
+  console.log('detected key down', event.key);
 });
 
 document.addEventListener("keyup", function(event) {
   isKeyDown[event.key] = false;
-  console.log("detectedf key up", event.key)
+  console.log('detected key up', event.key);
 });
 
-function isKeyDown() {
-  this.ArrowUp = false; //filler
-}
+export { isKeyDown };
 
 ////////////////game functions//////////////
 
-class Circle {
+export class Circle {
   constructor(canvas, centerX, centerY, radius, color = "red") {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.centerX = centerX;
     this.centerY = centerY;
     this.radius = radius;
-    
-    this.topEdge = centerY - radius;
-    this.bottomEdge = centerY + radius;
-    this.leftEdge = centerX - radius;
-    this.rightEdge = centerX + radius;
 
     this.lineWidth = 2;
     this.color = color;
@@ -112,7 +109,6 @@ class Circle {
   //why is 'objects' needed? well every frame everythis has to be redrawn
     this.die = function() {
       objects.splice(this.id,1);
-      this.ctx.clearRect(this.centerX, this.y, this.width, this.height)
     } 
 
     this.vspeed = 0;
@@ -147,15 +143,10 @@ class Circle {
   updateDimensions() {
     this.centerX += this.hspeed;
     this.centerY += this.vspeed;
-    
-    this.topEdge = this.y;
-    this.bottomEdge = this.y + this.height;
-    this.leftEdge = this.x;
-    this.rightEdge = this.x + this.width;
   }
 }
 
-class Rect {
+export class Rect {
   constructor(canvas, x, y, width, height, color = "red") {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
