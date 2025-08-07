@@ -1,12 +1,8 @@
 //@ts-check
 
-import { GameCanvas, isKeyDown } from "./game_engine.js";
+import { isKeyDown } from "./game_engine.js";
 import { Rect, Circle, Line } from "./game_engine.js";
-import { startGame } from "./game_utils.js";
-
-
-const canvas = document.getElementById("canvas");
-const gameCanvas = new GameCanvas(canvas);
+import { startGame, gameCanvas } from "./game_utils.js";
 
 ///////////////////define variables/////////////////////
 let square = new Rect(gameCanvas.ctx, 10, 10, 50, 50, "purple");

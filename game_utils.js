@@ -10,7 +10,7 @@ let interval = 1000/fps;
 let delta;
 const canvas = document.getElementById("canvas");
 
-const gameCanvas = new GameCanvas(canvas);
+export const gameCanvas = new GameCanvas(canvas);
 
 //////////////////game!////////////////////////////////
 
